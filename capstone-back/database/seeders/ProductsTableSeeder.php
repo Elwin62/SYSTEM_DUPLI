@@ -9,34 +9,34 @@ class ProductsTableSeeder extends Seeder
 {
     public function run()
     {
-        Product::insert([
+        Product::updateOrCreate(
+            ['name' => 'Dining Table'],
             [
-                'name' => 'Dining Table',
                 'description' => '',
                 'price' => 12500.00,
                 'stock' => 5,
-                'image' => 'storage/products/Ipon2025.jpg',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+                'image' => 'storage/products/Table.jpg',
+            ]
+        );
+
+        Product::updateOrCreate(
+            ['name' => 'Wooden Chair'],
             [
-                'name' => 'Wooden Chair',
-                'description' => '', 
+                'description' => '',
                 'price' => 7500.00,
                 'stock' => 3,
-                'image' => 'storage/products/Ipon2025.jpg',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+                'image' => 'storage/products/Chair.jpg',
+            ]
+        );
+
+        Product::updateOrCreate(
+            ['name' => 'Alkansya'],
             [
-                'name' => 'Alkansya',
                 'description' => '',
                 'price' => 159.00,
                 'stock' => 10,
-                'image' => 'storage/products/Ipon2025.jpg',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'image' => 'storage/products/Alkansya.jpg',
             ]
-        ]);
+        );
     }
 }

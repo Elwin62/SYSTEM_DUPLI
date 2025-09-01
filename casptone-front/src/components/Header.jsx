@@ -55,9 +55,9 @@ const Header = ({ role, username }) => {
             <div style={styles.right}>
                 {role === "customer" && (
                     <>
-                    <button style={styles.iconBtn} onClick={() => navigate("/my-orders")}>
+                    {/* <button style={styles.iconBtn} onClick={() => navigate("/my-orders")}>
                         My Orders
-                    </button>
+                    </button> */}
                     <button style={styles.iconBtn} onClick={() => navigate("/cart")}>
                         <ShoppingCart size={24} />
                         {cartCount > 0 && <span style={styles.cartBadge}>{cartCount}</span>}

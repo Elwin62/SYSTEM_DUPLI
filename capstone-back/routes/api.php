@@ -14,7 +14,10 @@ use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\OrderTrackingController;
 use App\Http\Controllers\AdminOverviewController;
 
+use App\Models\Production;
+use Illuminate\Support\Facades\DB;
 
+// Auth
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -33,7 +36,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/products/{id}/materials/import', [ProductController::class, 'importMaterialsCsv']);
 
     // Cart Routes
-    Route::post('/cart', [CartController::class, 'addToCart']);  // 
+    Route::post('/cart', [CartController::class, 'addToCart']);
     Route::get('/cart', [CartController::class, 'viewCart']);
     Route::put('/cart/{id}', [CartController::class, 'update']);
     Route::delete('/cart/{id}', [CartController::class, 'removeFromCart']);
@@ -43,10 +46,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/my-orders', [OrderController::class, 'myOrders']);
     Route::get('/orders/{id}/tracking', [OrderController::class, 'tracking']);
-    Route::middleware('auth:sanctum')->get('/orders/{id}', [OrderController::class, 'show']);
-    Route::middleware(['auth:sanctum'])->put('/orders/{id}/complete', [OrderController::class, 'markAsComplete']);
+    Route::get('/orders/{id}', [OrderController::class, 'show']);
+    Route::put('/orders/{id}/complete', [OrderController::class, 'markAsComplete']);
 
-    //Inventory Routes
+    // Inventory Routes
     Route::get('/inventory', [InventoryController::class, 'index']);
     Route::post('/inventory', [InventoryController::class, 'store']);
     Route::put('/inventory/{id}', [InventoryController::class, 'update']);
@@ -56,17 +59,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/inventory/consumption-trends', [InventoryController::class, 'getConsumptionTrends']);
     Route::get('/inventory/dashboard', [InventoryController::class, 'getDashboardData']);
 
+    // Usage
     Route::get('/usage', [UsageController::class, 'index']);
     Route::post('/usage', [UsageController::class, 'store']);
 
+    // Reports
     Route::get('/replenishment', [ReportController::class, 'replenishment']);
     Route::get('/forecast', [ReportController::class, 'forecast']);
     Route::get('/reports/stock.csv', [ReportController::class, 'stockCsv']);
     Route::get('/reports/usage.csv', [ReportController::class, 'usageCsv']);
     Route::get('/reports/replenishment.csv', [ReportController::class, 'replenishmentCsv']);
 
-    //Production Routes
-    
+    // Productions
     Route::get('/productions', [ProductionController::class, 'index']);
     Route::get('/productions/analytics', [ProductionController::class, 'analytics']);
     Route::get('/productions/predictive', [ProductionController::class, 'predictiveAnalytics']);
@@ -78,6 +82,24 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/productions/{id}', [ProductionController::class, 'show']);
     Route::delete('/productions/{id}', [ProductionController::class, 'destroy']);
 
+    // ✅ Analytics: Top Users
+    Route::get('/top-users', function () {
+        $topUsers = Production::select('user_id', DB::raw('SUM(quantity) as total_quantity'))
+            ->with('user:id,name')
+            ->groupBy('user_id')
+            ->orderByDesc('total_quantity')
+            ->take(5)
+            ->get()
+            ->map(function ($row) {
+                return [
+                    'user_name' => $row->user->name,
+                    'quantity'  => $row->total_quantity,
+                ];
+            });
+
+        return response()->json($topUsers);
+    });
+
     // Order Tracking Routes
     Route::get('/order-tracking/{orderId}', [OrderTrackingController::class, 'getTracking']);
     Route::post('/order-tracking', [OrderTrackingController::class, 'createTracking']);
@@ -87,6 +109,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Admin Overview
     Route::get('/admin/overview', [AdminOverviewController::class, 'index']);
-
 });
-

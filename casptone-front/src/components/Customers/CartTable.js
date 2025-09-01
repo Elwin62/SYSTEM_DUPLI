@@ -1,6 +1,6 @@
 // src/components/CartTable.js
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api/client";
 
 const CartTable = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -13,13 +13,7 @@ const CartTable = () => {
 
   const fetchCartItems = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("User not authenticated.");
-
-      const response = await axios.get("http://localhost:8000/api/cart", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
+      const response = await api.get("/cart");
       setCartItems(response.data || []);
     } catch (err) {
       setError("Failed to load cart items.");
@@ -30,12 +24,7 @@ const CartTable = () => {
 
   const handleEditQuantity = async (itemId, newQuantity) => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:8000/api/cart/${itemId}`,
-        { quantity: newQuantity },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.put(`/cart/${itemId}`, { quantity: newQuantity });
       fetchCartItems(); // refresh cart
     } catch (err) {
       alert("Failed to update item quantity.");
@@ -44,10 +33,7 @@ const CartTable = () => {
 
   const handleRemoveItem = async (itemId) => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:8000/api/cart/${itemId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete(`/cart/${itemId}`);
       fetchCartItems();
     } catch (err) {
       alert("Failed to remove item.");
@@ -62,7 +48,7 @@ const CartTable = () => {
     }
 
     try {
-      const headers = { Authorization: `Bearer ${token}` };
+      const headers = undefined;
       const orderId = orderResponse?.data?.order?.id || orderResponse?.data?.id || null;
       const today = new Date().toISOString().slice(0, 10);
       const stageStart = "Design";
@@ -83,9 +69,9 @@ const CartTable = () => {
 
       // Create all production records
       const productionResults = await Promise.allSettled(
-        payloads.map((payload) =>
-          axios.post("http://localhost:8000/api/productions", payload, { headers })
-        )
+          payloads.map((payload) =>
+            api.post("/productions", payload)
+          )
       );
 
       // Check results
@@ -115,12 +101,7 @@ const CartTable = () => {
 
   const handleCheckout = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.post(
-        "http://localhost:8000/api/checkout",
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await api.post("/checkout", {});
 
       // Try to create production records
       const productionResult = await createProductionsForOrder(response);

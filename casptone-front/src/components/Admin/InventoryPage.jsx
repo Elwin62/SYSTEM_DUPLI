@@ -390,13 +390,16 @@ const InventoryPage = () => {
   const fileInputRef = useRef(null);
 
   // API helper function
-  const apiCall = async (url, options = {}) => {
+  const apiBase = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api";
+  const apiCall = async (path, options = {}) => {
     const token = localStorage.getItem("token");
     const headers = {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers
     };
+
+    const url = path.startsWith('http') ? path : `${apiBase}${path.startsWith('/') ? path : `/${path}`}`;
 
     const response = await fetch(url, {
       ...options,
@@ -420,8 +423,8 @@ const InventoryPage = () => {
     setError("");
     try {
       const [invRes, usageRes] = await Promise.allSettled([
-        apiCall("http://localhost:8000/api/inventory"),
-        apiCall("http://localhost:8000/api/usage?days=120"),
+        apiCall("/inventory"),
+        apiCall("/usage?days=120"),
       ]);
 
       if (invRes.status === "fulfilled") setInventory(invRes.value || []);
@@ -452,7 +455,7 @@ const InventoryPage = () => {
       if (editingMaterial) {
         // Update existing material
         const response = await apiCall(
-          `http://localhost:8000/api/inventory/${editingMaterial.id}`,
+          `/inventory/${editingMaterial.id}`,
           {
             method: 'PUT',
             body: JSON.stringify(materialData)
@@ -466,7 +469,7 @@ const InventoryPage = () => {
       } else {
         // Add new material
         const response = await apiCall(
-          "http://localhost:8000/api/inventory",
+          "/inventory",
           {
             method: 'POST',
             body: JSON.stringify(materialData)
@@ -486,7 +489,7 @@ const InventoryPage = () => {
     }
 
     try {
-      await apiCall(`http://localhost:8000/api/inventory/${materialId}`, {
+      await apiCall(`/inventory/${materialId}`, {
         method: 'DELETE'
       });
       setInventory(prev => prev.filter(item => item.id !== materialId));
@@ -529,7 +532,7 @@ const InventoryPage = () => {
       if (pollRef.current) return;
       pollRef.current = setInterval(async () => {
         try {
-          const data = await apiCall("http://localhost:8000/api/inventory");
+          const data = await apiCall("/inventory");
           setInventory(data || []);
         } catch (e) {
           console.warn("Polling failed", e);

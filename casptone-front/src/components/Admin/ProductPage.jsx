@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminProductsTable from "./AdminProductsTable";
 import axios from "axios";
+import api from "../../api/client";
 import { motion } from "framer-motion";
-import { Modal, Button, Form } from "react-bootstrap"; // ✅ Import
+import { Modal, Button, Form } from "react-bootstrap"; //
 import "bootstrap/dist/css/bootstrap.min.css";
 import AppLayout from "../Header";
 
@@ -33,6 +34,7 @@ const ProductPage = () => {
       await axios.post("http://localhost:8000/api/products", newProduct, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      await api.post("/products", newProduct);
       setShowAddModal(false);
       setNewProduct({ name: "", description: "", price: "", stock: "", image: "" });
       setRefreshProducts((prev) => !prev);
@@ -45,12 +47,12 @@ const ProductPage = () => {
 
   return (
     <AppLayout>
-    <div className="container py-4 wood-animated" role="region" aria-labelledby="prod-heading">
+    <div className="container-fluid py-4 wood-animated" role="region" aria-labelledby="prod-track-heading">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
         {/* Back Button */}
-        <button className="btn btn-outline-secondary mb-3 btn-wood" onClick={() => navigate("/dashboard")}>
-          ← Back to Dashboard
-        </button>
+        <button className="btn btn-outline-secondary mb-3" onClick={() => navigate("/dashboard")}>
+        ← Back to Dashboard
+      </button>
 
         {/* Page Header */}
         <div className="text-center mb-4">

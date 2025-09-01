@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api/client";
 
 const OrdersTable = () => {
   const [orders, setOrders] = useState([]);
@@ -36,10 +36,7 @@ const OrdersTable = () => {
 
   const fetchOrders = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:8000/api/orders", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get("/orders");
       setOrders(response.data);
       setFilteredOrders(response.data);
     } catch (error) {
@@ -51,11 +48,7 @@ const OrdersTable = () => {
 
   const fetchOrderItems = async (orderId) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(
-        `http://localhost:8000/api/orders/${orderId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await api.get(`/orders/${orderId}`);
       setOrderItems(response.data.items || []);
     } catch (error) {
       console.error("Error fetching order items:", error);
@@ -99,12 +92,7 @@ const OrdersTable = () => {
   const confirmMarkAsComplete = async () => {
     if (!selectedOrder) return;
     try {
-      const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:8000/api/orders/${selectedOrder.id}/complete`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.put(`/orders/${selectedOrder.id}/complete`, {});
       fetchOrders();
       setShowConfirmModal(false);
     } catch (error) {

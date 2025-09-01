@@ -49,7 +49,7 @@ const CustomerDashboard = () => {
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <div className="text-center mb-4 wood-card p-3">
+                    <div className="text-center mb-4 p-3">
                     <h2 style={{ color: 'black' }} >UNICK FURNITURE</h2>
                     </div>
 
@@ -64,7 +64,7 @@ const CustomerDashboard = () => {
                     />
                 </div>
 
-                <div className="d-flex justify-content-center mb-3 gap-2">
+                {/* <div className="d-flex justify-content-center mb-3 gap-2">
                     <input
                         type="number"
                         className="form-control w-25"
@@ -72,7 +72,7 @@ const CustomerDashboard = () => {
                         value={selectedOrderId}
                         onChange={(e)=> setSelectedOrderId(e.target.value)}
                     />
-                </div>
+                </div> */}
 
                 <div className="card p-4 shadow-lg wood-card">
                     {loading ? (

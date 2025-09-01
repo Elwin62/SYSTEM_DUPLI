@@ -14,7 +14,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import axios from "axios";
+import api from "../../api/client";
 
 // Simple CSV export helper
 const toCSV = (rows, columns) => {
@@ -26,11 +26,7 @@ const toCSV = (rows, columns) => {
 const STAGES = ["Design", "Preparation", "Cutting", "Assembly", "Finishing", "Quality Control"];
 const COLORS = ["#f39c12", "#2980b9", "#8e44ad", "#27ae60"];
 
-const API_BASE = "http://localhost:8000/api";
-const authHeaders = () => {
-  const token = localStorage.getItem("token");
-  return { Authorization: `Bearer ${token}` };
-};
+const authHeaders = () => ({});
 
 export default function ProductionTrackingSystem() {
   const navigate = useNavigate();
@@ -55,9 +51,7 @@ export default function ProductionTrackingSystem() {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.get(`${API_BASE}/productions`, {
-        headers: authHeaders(),
-      });
+      const res = await api.get(`/productions`);
       const data = res.data || [];
       setProductions(data);
       setFiltered(data);
@@ -149,7 +143,7 @@ export default function ProductionTrackingSystem() {
 
   const updateStage = async (id, newStage) => {
     try {
-      const res = await axios.patch(`${API_BASE}/productions/${id}`, { stage: newStage }, { headers: authHeaders() });
+      const res = await api.patch(`/productions/${id}`, { stage: newStage });
       const updated = res.data;
       setProductions((prev) => prev.map((p) => (p.id === id ? updated : p)));
     } catch (err) {

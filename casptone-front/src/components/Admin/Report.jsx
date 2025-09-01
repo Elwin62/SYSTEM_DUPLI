@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../api/client";
 import AppLayout from "../Header";
 import { getForecast, downloadStockCsv, downloadUsageCsv, downloadReplenishmentCsv } from "../../api/inventoryApi";
 
@@ -13,13 +13,7 @@ const Report = () => {
     useEffect(() => {
         const fetchReports = async () => {
             try {
-                const token = localStorage.getItem("token");
-                // Use replenishment endpoint which returns structured inventory recommendations
-                const response = await axios.get("http://localhost:8000/api/replenishment", {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const response = await api.get("/replenishment");
                 setReportData(response.data || []);
                 const fc = await getForecast({ window: windowDays });
                 setForecastData(fc || []);

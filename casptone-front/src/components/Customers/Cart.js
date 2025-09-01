@@ -29,7 +29,7 @@ const Cart = () => {
           className={`pill-btn ${view === "orders" ? "active" : ""}`}
           onClick={() => setView("orders")}
         >
-          Orders
+          My Orders
         </button>
       </div>
 

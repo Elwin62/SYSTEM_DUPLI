@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api/client";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./admin_products.css";
 
@@ -24,13 +24,11 @@ const AdminProductsTable = () => {
   const [materials, setMaterials] = useState([]); // inventory list for picker
 
   const token = localStorage.getItem("token");
-  const headers = { Authorization: `Bearer ${token}` };
+  const headers = {}; // handled by api client
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/products", {
-        headers,
-      });
+      const response = await api.get("/products");
       setProducts(response.data);
       setLoading(false);
     } catch (error) {
@@ -50,8 +48,8 @@ const AdminProductsTable = () => {
     setSelectedProduct(product);
     try {
       const [invRes, bomRes] = await Promise.all([
-        axios.get("http://localhost:8000/api/inventory", { headers }),
-        axios.get(`http://localhost:8000/api/products/${product.id}/materials`, { headers }),
+        api.get("/inventory"),
+        api.get(`/products/${product.id}/materials`),
       ]);
       setMaterials(invRes.data || []);
       setBom(bomRes.data || []);
@@ -67,7 +65,7 @@ const AdminProductsTable = () => {
 
   const saveBom = async () => {
     try {
-      await axios.post(`http://localhost:8000/api/products/${selectedProduct.id}/materials`, { items: bom }, { headers });
+      await api.post(`/products/${selectedProduct.id}/materials`, { items: bom });
       setShowBomModal(false);
     } catch (e) {
       console.error(e);
@@ -77,7 +75,7 @@ const AdminProductsTable = () => {
 
   const exportBom = async () => {
     try {
-      const res = await axios.get(`http://localhost:8000/api/products/${selectedProduct.id}/materials/export`, { headers, responseType: 'blob' });
+      const res = await api.get(`/products/${selectedProduct.id}/materials/export`, { responseType: 'blob' });
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const a = document.createElement('a');
       a.href = url;
@@ -93,7 +91,7 @@ const AdminProductsTable = () => {
     const form = new FormData();
     form.append('file', file);
     try {
-      await axios.post(`http://localhost:8000/api/products/${selectedProduct.id}/materials/import`, form, { headers });
+      await api.post(`/products/${selectedProduct.id}/materials/import`, form);
       await openBomModal(selectedProduct);
     } catch (e) {
       console.error(e);
@@ -115,9 +113,7 @@ const AdminProductsTable = () => {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8000/api/products/${deleteId}`, {
-        headers,
-      });
+      await api.delete(`/products/${deleteId}`);
       setProducts(products.filter((product) => product.id !== deleteId));
       setShowDeleteModal(false);
     } catch (error) {
@@ -135,10 +131,9 @@ const AdminProductsTable = () => {
 
   const handleSave = async () => {
     try {
-      await axios.put(
-        `http://localhost:8000/api/products/${selectedProduct.id}`,
-        formData,
-        { headers }
+      await api.put(
+        `/products/${selectedProduct.id}`,
+        formData
       );
       setShowEditModal(false);
       fetchProducts();

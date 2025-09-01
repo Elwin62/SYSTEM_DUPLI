@@ -10,24 +10,22 @@ class UsersTableSeeder extends Seeder
 {
     public function run()
     {
-        User::insert([
+        User::updateOrCreate(
+            ['email' => 'admin@gmail.com'],
             [
                 'name' => 'Admin',
-                'email' => 'admin@gmail.com',
                 'password' => Hash::make('admin'),
                 'role' => 'employee',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'customer@gmail.com'],
             [
                 'name' => 'Customer',
-                'email' => 'customer@gmail.com',
                 'password' => Hash::make('customer'),
                 'role' => 'customer',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            
-        ]);
+            ]
+        );
     }
 }

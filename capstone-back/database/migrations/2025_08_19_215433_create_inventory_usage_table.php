@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up(): void {
-        Schema::create('inventory_usage', function (Blueprint $table) {
+        Schema::create('inventory_usages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('inventory_item_id')->constrained()->onDelete('cascade');
             $table->date('date');
@@ -16,6 +16,6 @@ return new class extends Migration {
         });
     }
     public function down(): void {
-        Schema::dropIfExists('inventory_usage');
+        Schema::dropIfExists('inventory_usages');
     }
 };
